@@ -5,9 +5,12 @@ library(dplyr)
 library(DT)
 
 ##--------------
-#plan to build a function that takes google scholar ID as argument,
+#plan to build a function (calc_indices) that takes google scholar ID as argument,
 #outputs DT of head of
 #Author, total cites (max(cumsum)), h, g, i10, i50, i100, hc, m= slope of h
+
+#could also use purrr with function and a vector of ids
+#  do       map_df(id_list, calc_indices)
 ##------------
 
 
@@ -24,8 +27,17 @@ id3<- "EIkJanYAAAAJ"
 #Google scholar ID for Krishna Rao
 id4<- "p6YtnDoAAAAJ"
 
+#Google scholar ID for Shrinivas Bishu
+id5<- "uxFxamsAAAAJ"
+
+#Google scholar ID for Calen Steiner
+id6<- "SrZ7n1cAAAAJ"
+
 #list of scholar IDs
-id_list <- c(id, id2, id3, id4)
+id_list <- c(id, id2, id3, id4, id5)
+
+#set id
+id <- id4
 
 profile <- get_profile(id)
 get_num_distinct_journals(id)
@@ -38,7 +50,8 @@ journals <- c("Gastroenterology", "Gut", "American Journal of Gastroenterology",
               "Clinical Journal of Gastroenterology", "New England Journal of Medicine",
               "Annals of Internal Medicine", "The Lancet", "JAMA", "JAMA Internal Medicine",
               "Journal of Clinical Investigation", "Science Translational Medicine",
-              "Nature Medicine", "Nature Reviews Gastroenterology and Hepatology")
+              "Nature Medicine", "Nature Reviews Gastroenterology and Hepatology",
+              "Lancet Infectious Diseases", "Clinical Infectious Diseases")
 get_num_top_journals(id, journals)
 
 
@@ -66,18 +79,28 @@ journals3 <- c("American Journal of Gastroenterology",
                "Lancet Infectious Diseases", "Clinical Infectious Diseases")
 predict_h_index(id, journals3)
 
+#now predictions for Peter
+predict_h_index(id1, journals)
+
 #now predictions for Akbar
-predict_h_index(id2, journals3)
+predict_h_index(id2, journals)
 
 #now predictions for Shail
-predict_h_index(id3, journals3)
+predict_h_index(id3, journals)
 
 #now predictions for Krishna
-predict_h_index(id4, journals3)
+predict_h_index(id4, journals)
+
+
 
 id <- id1
 #---------------------
-pubs<- get_publications(id, cstart = 0, pagesize = 900000, flush = FALSE)
+#function calc_indices
+#calc_indices <- {
+  library(scholar)
+  library(dplyr)
+  library(DT)
+pubs<- get_publications(id, cstart = 0, pagesize = 1000, flush = FALSE)
 #note that some pubs have year = NA. Clean up.
 pubs$year[is.na(pubs$year)]<- 0
 
@@ -130,18 +153,20 @@ pubs$hslope = round(pubs$hvalue[1] /(current_year - 2003),2)
 pubs$m2 = pubs$hvalue[1] /(current_year - start_year)
 
 #predicted h slope
-pred_hslope_vector <- predict_h_index(id, journals3)
+pred_hslope_vector <- predict_h_index(id, journals)
 pubs$pred_hslope <- round((max(pred_hslope_vector$h_index)-
                              min(pred_hslope_vector$h_index))/10, 2)
 
 #output nice table
-pubs %>%
+output <- pubs %>%
   select(author, cumsum, hvalue, gvalue, i10value, i50value, i100value,
          hcvalue, hslope, pred_hslope) %>% filter(cumsum==max(cumsum)) %>%
   head(1) %>%
   datatable(colnames = c("Author", "Citations", "h index", "g index", "i10",
                          "i50", "i100", "hc", "h slope", "pred h slope"))
+output
 
+#}
 
 #estimates for M index- slope of h over time
 # from http://blogs.plos.org/biologue/2012/10/19/why-i-love-the-h-index/
