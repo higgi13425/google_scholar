@@ -33,11 +33,12 @@ id5<- "uxFxamsAAAAJ"
 #Google scholar ID for Calen Steiner
 id6<- "SrZ7n1cAAAAJ"
 
+
 #list of scholar IDs
-id_list <- c(id, id2, id3, id4, id5)
+id_list <- c(id, id2, id3, id4, id5, id6)
 
 #set id
-id <- id4
+id <- id5
 
 profile <- get_profile(id)
 get_num_distinct_journals(id)
@@ -91,9 +92,12 @@ predict_h_index(id3, journals)
 #now predictions for Krishna
 predict_h_index(id4, journals)
 
+#now predictions for Calen
+predict_h_index(id6, journals)
 
+#now predictions for Shrinivas
+predict_h_index(id5, journals)
 
-id <- id1
 #---------------------
 #function calc_indices
 #calc_indices <- {
